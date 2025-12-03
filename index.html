@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="MobileOptimized" content="320">
+  <title>官方平台</title>
+  <style>
+    /* 全局容器样式 */
+    .content {
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      left: 0;
+      top: 0;
+      border: none;
+    }
+
+    /* 圆圈加载中样式 */
+    .loading-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #ff3b3b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- 仅保留加载小圆圈 -->
+  <div class="loading-spinner"></div>
+
+  <script>
+    // 原有逻辑保留
+    var urlParams = new URLSearchParams(window.location.search);
+    var encodedParam = urlParams.get('c');
+    var tureurl = atob(encodedParam);
+    if (tureurl.includes("http")) {
+      var spinner = document.querySelector(".loading-spinner");
+      setTimeout(function() {
+        spinner.style.display = "none";
+      }, 1500);
+      var html='<iframe class="content" onload="bindMouseWhee(this)" src='+tureurl+'></iframe>';
+      document.writeln(html);
+      console.log(tureurl);
+    } else {
+      console.log("nourls");
+    }
+
+    var firefox = navigator.userAgent.indexOf('Firefox') != -1;
+    function MouseWheel(e,doc){
+      e.preventDefault && e.preventDefault(),e.returnValue = false;
+      var up = firefox && e.detail < 0 || e.wheelDelta > 0;
+      doc.body.scrollTop = doc.documentElement.scrollTop += up?-50:50;
+    }
+    function bindMouseWhee(ifr){
+      try{
+        var doc = ifr.contentWindow.document;
+        firefox?doc.addEventListener('DOMMouseScroll',function(e){MouseWheel(e,doc)},false):(doc.onmousewheel = function(e){MouseWheel(e||ifr.contentWindow.event,doc)});
+      }catch(e){
+        alert('跨域无法获取iframe加载document'+e);
+      }
+    }
+  </script>
+</body>
+</html>
